@@ -50,7 +50,7 @@ namespace DesktopViewer {
         private void enabled_Click(object sender, EventArgs e) {
             if (enabledButton.Checked) {
                 enabledButton.Text = "Stop";
-                this.captureBounds = ((ScreenWrapper)monitorSelection.SelectedItem).Screen.Bounds;
+                this.captureBounds = getSelectedScreen().Bounds;
                 Bitmap p = new Bitmap(this.captureBounds.Size.Width, this.captureBounds.Size.Height);
                 this.image.Image = p;
 
@@ -62,8 +62,21 @@ namespace DesktopViewer {
             }
         }
 
+        private Screen getSelectedScreen() {
+            return ((ScreenWrapper)monitorSelection.SelectedItem).Screen;
+        }
+
         private void timer1_Tick(object sender, EventArgs e) {
             this.graphics.CopyFromScreen(captureBounds.Location, new Point(0, 0), captureBounds.Size);
+            Point p = System.Windows.Forms.Cursor.Position;
+            if (getSelectedScreen().Bounds.Contains(p)) {
+                Pen pen = new Pen(Color.Black, 3);
+                Point topLeft = getSelectedScreen().Bounds.Location;
+                int x = p.X - topLeft.X;
+                int y = p.Y - topLeft.Y;
+                this.graphics.DrawEllipse(pen, x - 2, y - 2, 5, 5);
+            }
+
             this.image.Invalidate();
         }
 
